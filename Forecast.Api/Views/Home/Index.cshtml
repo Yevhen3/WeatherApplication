@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model Forecast.Api.Models.Weather
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2>Weather App</h2>
+        </div>
+        <div class="card-body">
+            <form id="weatherForm" asp-controller="Home" asp-action="GetWeather" method="post">
+                <div class="form-group">
+                    <label for="cityName">City Name</label>
+                    <input type="text" class="form-control" id="cityName" name="cityName" placeholder="Enter city name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Get Weather</button>
+            </form>
+
+            <div id="weatherResult" class="mt-4" style="display: none;">
+                <h3 id="weatherCity"></h3>
+                <p>Max Temperature: <span id="maxTemp"></span> °F</p>
+                <p>Min Temperature: <span id="minTemp"></span> °F</p>
+                <div id="warning" class="alert alert-warning" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedData = localStorage.getItem("lastCityForecast");
+        if (savedData) {
+            const weatherData = JSON.parse(savedData);
+            displayWeather(weatherData);
+        }
+    });
+
+    document.getElementById('weatherForm').addEventListener('submit', async function (event) {
+        event.preventDefault(); 
+
+        const cityName = document.getElementById('cityName').value;
+
+        const response = await fetch('@Url.Action("GetWeather", "Home")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ cityName: cityName })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            localStorage.setItem("lastCityForecast", JSON.stringify(data));
+
+            displayWeather(data);
+        } else {
+            console.error('Failed to fetch weather data');
+        }
+    });
+
+    function displayWeather(data) {
+        document.getElementById("weatherCity").textContent = `Weather in ${data.city}`;
+        document.getElementById("maxTemp").textContent = data.maxTemperature;
+        document.getElementById("minTemp").textContent = data.minTemperature;
+
+        const warningElement = document.getElementById("warning");
+        if (data.warning) {
+            warningElement.textContent = data.warning;
+            warningElement.style.display = "block";
+        } else {
+            warningElement.style.display = "none";
+        }
+
+        document.getElementById("weatherResult").style.display = "block";
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

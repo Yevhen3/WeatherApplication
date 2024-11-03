@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "tGHipY2v/84=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\yevhe\\RiderProjects\\WeatherApplication\\Forecast.Api\\Forecast.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\yevhe\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
